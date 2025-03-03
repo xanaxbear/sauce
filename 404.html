@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const path = window.location.pathname;
+            const targetUrl = "https://masochi.st" + path;
+            
+            setTimeout(() => {
+                document.body.classList.add('show');
+            }, 1000);
+            
+            window.location.replace(targetUrl);
+        });
+    </script>
+</head>
+<body>
+    <p>If you are not redirected, <a id="redirect-link" href="#">click here</a>.</p>
+    <script>
+        const path = window.location.pathname;
+        document.getElementById("redirect-link").href = "https://masochi.st" + path;
+    </script>
+</body>
+</html>
