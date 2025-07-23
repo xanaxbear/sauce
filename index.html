@@ -1,29 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>xanax</title>
-    <meta property="og:title" content="deus ignoscat mihi, quia peccavi">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://harmle.ss">
+  <meta charset="UTF-8" />
+  <title>harmle.ss</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: monospace;
+      background-color: #121212;
+      color: #e0e0e0;
+      padding: 20px;
+    }
+
+    h1 {
+      border-bottom: 1px solid #444;
+      padding-bottom: 5px;
+    }
+
+    .entry-list {
+      margin-top: 20px;
+    }
+
+    .entry {
+      cursor: pointer;
+      padding: 8px;
+      border-bottom: 1px solid #333;
+    }
+
+    .entry:hover {
+      background-color: #1e1e1e;
+    }
+
+    .button {
+      margin-top: 20px;
+      padding: 6px 12px;
+      background: #333;
+      color: #eee;
+      border: none;
+      cursor: pointer;
+    }
+
+    .button:hover {
+      background: #444;
+    }
+
+    .form {
+      margin-top: 20px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      background-color: #1e1e1e;
+      color: #eee;
+      border: 1px solid #444;
+      font-family: monospace;
+    }
+
+    .back-button {
+      margin-top: 10px;
+      display: inline-block;
+      color: #888;
+      cursor: pointer;
+    }
+
+    .delete-button {
+      margin-left: 10px;
+      color: #c00;
+      cursor: pointer;
+    }
+
+    .timestamp {
+      color: #777;
+      font-size: 0.9em;
+    }
+  </style>
 </head>
 <body>
-    <h1>im either raped by the NCA or drooling off of xanax</h1>
+  <h1>harmle.ss</h1>
+  <div id="main"></div>
 
-    <style>
-        body {
-            background-color: black;
-            color: white;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            height: 100vh;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-    </style>
+  <script>
+    const main = document.getElementById('main');
 
+    function loadEntries() {
+      const entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
+      return entries.sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
+
+    function saveEntries(entries) {
+      localStorage.setItem('diaryEntries', JSON.stringify(entries));
+    }
+
+    function showList() {
+      const entries = loadEntries();
+      main.innerHTML = '';
+
+      const list = document.createElement('div');
+      list.className = 'entry-list';
+
+      entries.forEach((entry, i) => {
+        const div = document.createElement('div');
+        div.className = 'entry';
+        div.innerHTML = `
+          <strong>${entry.title}</strong><br>
+          <span class="timestamp">${new Date(entry.date).toLocaleString()}</span>
+          <span class="delete-button" onclick="deleteEntry(${i}, event)">[delete]</span>
+        `;
+        div.onclick = () => showEntry(entry);
+        list.appendChild(div);
+      });
+
+      const button = document.createElement('button');
+      button.className = 'button';
+      button.textContent = 'New Entry';
+      button.onclick = showForm;
+
+      main.appendChild(button);
+      main.appendChild(list);
+    }
+
+    function showEntry(entry) {
+      main.innerHTML = `
+        <h2>${entry.title}</h2>
+        <div class="timestamp">${new Date(entry.date).toLocaleString()}</div>
+        <pre>${entry.body}</pre>
+        <div class="back-button" onclick="showList()">← Back</div>
+      `;
+    }
+
+    function showForm() {
+      main.innerHTML = `
+        <div class="form">
+          <input id="title" placeholder="Title">
+          <textarea id="body" rows="10" placeholder="Your diary entry..."></textarea>
+          <button class="button" onclick="saveEntry()">Save</button>
+          <div class="back-button" onclick="showList()">← Cancel</div>
+        </div>
+      `;
+    }
+
+    function saveEntry() {
+      const title = document.getElementById('title').value.trim();
+      const body = document.getElementById('body').value.trim();
+
+      if (!title || !body) {
+        alert('Title and body are required.');
+        return;
+      }
+
+      const entries = loadEntries();
+      entries.push({ title, body, date: new Date().toISOString() });
+      saveEntries(entries);
+      showList();
+    }
+
+    function deleteEntry(index, event) {
+      event.stopPropagation();
+      if (!confirm('Delete this entry?')) return;
+      const entries = loadEntries();
+      entries.splice(index, 1);
+      saveEntries(entries);
+      showList();
+    }
+
+
+    showList();
+  </script>
 </body>
 </html>
